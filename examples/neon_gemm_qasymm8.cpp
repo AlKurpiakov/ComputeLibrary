@@ -24,7 +24,7 @@
 #include "arm_compute/core/Types.h"
 #include "arm_compute/runtime/NEON/NEFunctions.h"
 #include "arm_compute/runtime/NEON/functions/NEConvolutionLayer.h"
-
+    
 #include <cstdlib>
 #include <vector>
   
