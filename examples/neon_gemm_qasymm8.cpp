@@ -27,22 +27,22 @@
 
 #include <cstdlib>
 #include <vector>
-
+  
 using namespace arm_compute;
 using namespace std;
 
 int main(){
-    vector<float> in(1*32*3*100, 1);
-    vector<float> o(32*100*64, 0);
-    vector<float> w(9*3*64, 1);
-    vector<float> b(64, 1);
+    vector<float> input(1*32*3*100, 1);
+    vector<float> out(32*100*64, 0);
+    vector<float> weights(9*3*64, 1);
+    vector<float> biases(64, 1);
 
-    Tensor input;
-    Tensor weights;
-    Tensor biases;
-    Tensor out;
+    Tensor input_tensor;
+    Tensor weights_tensor;
+    Tensor biases_tensor;
+    Tensor out_tensor;
 
-    input.allocator()->init(TensorInfo(TensorShape(1, 3, 32, 100), 3, DataType::F32, DataLayout::NCHW));
+    input_tensor.allocator()->init(TensorInfo(TensorShape(1, 3, 32, 100), 3, DataType::F32, DataLayout::NCHW));
     TensorShape weights_sh(64, 3, 3, 3);
     TensorShape biases_sh(64);
     TensorShape out_sh(1, 64, 32, 100);
@@ -54,21 +54,23 @@ int main(){
 
 
     Status status = NEConvolutionLayer::validate(&input_info, &weights_info, &biases_info, &out_info, PadStrideInfo(1, 1, -1, -1));
-    cout << status.error_description();
+    cout << status.error_description() << endl;
 
-    weights.allocator()->init(TensorInfo(weights_sh, 1, DataType::F32));
-    biases.allocator()->init(TensorInfo(biases_sh, 1, DataType::F32));
-    out.allocator()->init(TensorInfo(out_sh, 1, DataType::F32));
+    weights_tensor.allocator()->init(TensorInfo(weights_sh, 1, DataType::F32));
+    biases_tensor.allocator()->init(TensorInfo(biases_sh, 1, DataType::F32));
+    out_tensor.allocator()->init(TensorInfo(out_sh, 1, DataType::F32));
 
     NEConvolutionLayer neConv;
-    neConv.configure(&input, &weights, &biases, &out, PadStrideInfo(1, 1, -1, -1));
+    neConv.configure(&input_tensor, &weights_tensor, &biases_tensor, &out_tensor, PadStrideInfo(1, 1, -1, -1));
     
-    input.allocator()->import_memory(in.data());
-    weights.allocator()->import_memory(w.data());
-    biases.allocator()->import_memory(b.data());
-    out.allocator()->import_memory(o.data());
+    input_tensor.allocator()->import_memory(input.data());
+    weights_tensor.allocator()->import_memory(weights.data());
+    biases_tensor.allocator()->import_memory(biases.data());
+    out_tensor.allocator()->import_memory(out.data());
     
+    cout << out[650] << endl;//0
     neConv.run();
+    cout << out[650] << endl;//
     
     return 0;
 }
